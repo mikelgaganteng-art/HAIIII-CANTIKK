@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Untuk Kamu</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            background-color: #050505;
+            overflow: hidden;
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+        }
+
+        /* Container Utama */
+        .tv-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            max-width: 800px;
+            max-height: 600px;
+            border: 20px solid #222;
+            border-radius: 10px;
+            background: #111;
+            box-shadow: 0 0 30px rgba(0,0,0,0.8);
+            overflow: hidden;
+        }
+
+        /* Efek Garis TV Jadul (Scanlines) */
+        .tv-container::before {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 5;
+            background-size: 100% 4px, 6px 100%;
+            pointer-events: none;
+        }
+
+        /* Efek Flicker/Kedipan TV Tua */
+        .tv-container::after {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: rgba(18, 16, 16, 0.1);
+            opacity: 0;
+            z-index: 6;
+            pointer-events: none;
+            animation: flicker 0.15s infinite;
+        }
+
+        @keyframes flicker {
+            0% { opacity: 0.18; }
+            50% { opacity: 0.22; }
+            100% { opacity: 0.18; }
+        }
+
+        /* Frame Foto */
+        .slideshow {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        .slide {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0;
+            filter: grayscale(30%) sepia(20%) contrast(120%); /* Efek Kamera Jadul */
+            transition: opacity 0.05s ease-in-out;
+        }
+
+        .slide.active {
+            opacity: 1;
+        }
+
+        /* Tampilan Overlay Kamera (REC, Batere, dll) */
+        .camera-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            z-index: 4;
+            pointer-events: none;
+            font-size: 14px;
+            letter-spacing: 1px;
+            text-shadow: 1px 1px 2px #000;
+        }
+
+        .top-overlay, .bottom-overlay {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .rec-dot {
+            width: 10px;
+            height: 10px;
+            background-color: red;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 5px;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        /* Tombol Play Awal */
+        .start-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #000;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .start-btn {
+            padding: 12px 24px;
+            background: none;
+            border: 2px solid #fff;
+            color: #fff;
+            font-family: inherit;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .start-btn:hover {
+            background: #fff;
+            color: #000;
+        }
+
+        /* Wadah Kata-kata Indah (Menyesuaikan dengan Gaya TV Analog) */
+        .love-story-container {
+            position: absolute;
+            bottom: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 4;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 12px 20px;
+            border-radius: 6px;
+            pointer-events: none;
+            max-width: 85%;
+            width: 500px;
+            border-left: 3px solid #ff4757;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .story-text {
+            font-size: 15px;
+            text-align: center;
+            line-height: 1.4;
+            color: #f1f2f6;
+            text-shadow: 1px 1px 2px #000;
+        }
+
+        /* Efek kursor mengetik */
+        .cursor {
+            display: inline-block;
+            width: 8px;
+            height: 15px;
+            background-color: #fff;
+            margin-left: 4px;
+            animation: blink 0.8s infinite;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="start-overlay" id="startOverlay">
+        <button class="start-btn" id="startBtn">KLIK UNTUK MEMULAI</button>
+    </div>
+
+    <div class="tv-container">
+        <div class="camera-overlay">
+            <div class="top-overlay">
+                <div><span class="rec-dot"></span>REC</div>
+                <div>RAW 4K 16:9</div>
+            </div>
+            <div class="bottom-overlay">
+                <div id="liveTime">00:00:00</div>
+                <div>🔋 99%</div>
+            </div>
+        </div>
+
+        <div class="love-story-container">
+            <span class="story-text" id="storyText"></span><span class="cursor"></span>
+        </div>
+
+        
+        <div class="slideshow" id="slideshow">
+            <img src="Foto01.jpg" class="slide active" alt="Foto 1">
+            <img src="Foto02.jpg" class="slide" alt="Foto 2">
+            <img src="Foto03.jpg" class="slide" alt="Foto 3">
+            <img src="Foto04.jpg" class="slide" alt="Foto 4">
+            <img src="Foto05.jpg" class="slide" alt="Foto 5">
+            <img src="Foto06.jpg" class="slide" alt="Foto 6">
+            <img src="Foto07.jpg" class="slide" alt="Foto 7">
+            <img src="Foto08.jpg" class="slide" alt="Foto 8">
+            <img src="Foto09.jpg" class="slide" alt="Foto 9">
+            <img src="Foto10.jpg" class="slide" alt="Foto 10">
+            <img src="Foto11.jpg" class="slide" alt="Foto 11">
+            <img src="Foto12.jpg" class="slide" alt="Foto 12">
+            <img src="Foto13.jpg" class="slide" alt="Foto 13">
+            <img src="Foto14.jpg" class="slide" alt="Foto 14">
+            <img src="Foto15.jpg" class="slide" alt="Foto 15">
+            <img src="Foto16.jpg" class="slide" alt="Foto 16">
+            <img src="Foto17.jpg" class="slide" alt="Foto 17">
+            <img src="Foto18.jpg" class="slide" alt="Foto 18">
+            <img src="Foto19.jpg" class="slide" alt="Foto 19">
+            <img src="Foto20.jpg" class="slide" alt="Foto 20">
+        </div>
+    </div>
+
+    <audio id="bgMusic" loop preload="auto">
+        <source src="Monokrom.mp3" type="audio/mpeg">
+        Browser kamu tidak mendukung pemutar audio.
+    </audio>
+
+    <script>
+        const slides = document.querySelectorAll('.slide');
+        let currentSlide = 0;
+        let slideInterval;
+        const music = document.getElementById('bgMusic');
+        const startOverlay = document.getElementById('startOverlay');
+        const startBtn = document.getElementById('startBtn');
+
+        // DAFTAR KATA-KATA INDAH (Kamu bisa ubah atau tambah teks di bawah ini)
+        const loveQuotes = [
+            "Bumi fana, namun padaa saat harii aku bertemu denganmu adalah keabadiannn dalamm suatuu hiduppkuu.",
+            "Di antara miliaran jiwa, mataku memilihhh jatuh dan menetap indah diri mu.",
+            "Bertemu denganmu seperti menemukan bagian kompas yang hilanggg.",
+            "Padaaa saatt itu, duniaaainik enggaaa lagiiii samaaa. Semuanya menjadi lebih indah.",
+            "Menyayangimu adalah hal paling alami yang pernah kulakukan.",
+            "Dari semua hari yang aku lewatin, kamu masih jadi bagian paling aku suka. ❤️"
+             
+        ];
+
+        let quoteIndex = 0;
+        let charIndex = 0;
+        const storyTextEl = document.getElementById('storyText');
+
+        // Fungsi Efek Mengetik Kata-kata
+        function typeWriter() {
+            if (charIndex < loveQuotes[quoteIndex].length) {
+                storyTextEl.innerHTML += loveQuotes[quoteIndex].charAt(charIndex);
+                charIndex++;
+                setTimeout(typeWriter, 80); // Kecepatan ketikan per huruf (ms)
+            } else {
+                // Beri jeda sebelum mengganti kalimat berikutnya
+                setTimeout(deleteText, 2500);
+            }
+        }
+
+        // Fungsi Menghapus Kata-kata sebelum ganti kalimat baru
+        function deleteText() {
+            if (charIndex > 0) {
+                storyTextEl.innerHTML = loveQuotes[quoteIndex].substring(0, charIndex - 1);
+                charIndex--;
+                setTimeout(deleteText, 40); // Kecepatan menghapus teks
+            } else {
+                quoteIndex = (quoteIndex + 1) % loveQuotes.length;
+                setTimeout(typeWriter, 500);
+            }
+        }
+
+        // Fungsi Menjalankan Gambar Bergantian Sangat Cepat
+        function nextSlide() {
+            slides[currentSlide].classList.remove('active');
+            currentSlide = (currentSlide + 1) % slides.length;
+            slides[currentSlide].classList.add('active');
+        }
+
+        // Fungsi utama saat tombol diklik
+        function startEverything() {
+            startOverlay.style.display = 'none';
+            playAudio();
+
+            // Jalankan transisi foto cepat (150ms)
+            slideInterval = setInterval(nextSlide, 150);
+            
+            // Jalankan jam kamera
+            setInterval(updateTime, 1000);
+
+            // Mulai efek teks romantis
+            setTimeout(typeWriter, 1000);
+        }
+
+        // Fungsi Penanganan Audio
+        function playAudio() {
+            music.play().then(() => {
+                console.log("Audio berhasil berputar!");
+            }).catch(error => {
+                console.log("Audio diblokir atau gagal dimuat: ", error);
+                document.body.addEventListener('click', () => {
+                    music.play();
+                }, { once: true });
+            });
+        }
+
+        startBtn.addEventListener('click', startEverything);
+
+        function updateTime() {
+            const now = new Date();
+            const hrs = String(now.getHours()).padStart(2, '0');
+            const mins = String(now.getMinutes()).padStart(2, '0');
+            const secs = String(now.getSeconds()).padStart(2, '0');
+            document.getElementById('liveTime').innerText = `${hrs}:${mins}:${secs}`;
+        }
+    </script>
+</body>
+</html>
